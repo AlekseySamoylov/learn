@@ -18,13 +18,13 @@ task copyDockerFiles(type: Copy) {
     from "${project.buildDir}/libs"
     into { "${project.buildDir}/docker" }
     include "*"
-    exclude "**/*.yml"
+//    exclude "**/*.yml"
 }
 
 task buildDocker(type: DockerBuildImage, dependsOn: 'copyDockerFiles') {
     description = "Package application as Docker image"
     group = "Docker"
     inputDir = project.file("${project.buildDir}/docker")
-    tags = ["vocabulary:latest".toString(), "vocabulary:${project.version}".toString()]
+    tags = ["learn:latest".toString(), "learn:${project.version}".toString()]
 }
 

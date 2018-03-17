@@ -1,0 +1,15 @@
+version: '2'
+services:
+  learn-api:
+    build: .
+    links:
+      - learn-mongo
+    depends_on:
+      - learn-mongo
+    ports:
+      - 8080:8080
+  learn-mongo:
+    image: mongo:latest
+    container_name: "learn-mongo"
+    ports:
+      - 27017
