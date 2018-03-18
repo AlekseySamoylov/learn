@@ -60,5 +60,17 @@ docker-compose stop
 
 docker-compose rm
 
+<h4>How to start Learn-project using OpenShift:</h4>
+Install MiniShift and execute the following commands:
+
+oc login ${your_minishift_console_url}
+
+oc new-project learn
+
+oc new-app library/mongo --name learn-mongo
+
+oc new-app alekseysamoylov/learn --name learn-api
+
+oc expose svc/learn-api
 
 
