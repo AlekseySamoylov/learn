@@ -1,7 +1,6 @@
 package com.alekseysamoylov.learn.controller;
 
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +22,8 @@ public class TestController {
 
     @RequestMapping("/saveUser")
     public List<User> saveUser() {
-        int randomNumber = ThreadLocalRandom.current().nextInt();
-        User user = new User().setName("Username" + randomNumber);
+        var randomNumber = ThreadLocalRandom.current().nextInt();
+        var user = new User().setName("Username" + randomNumber);
         userService.save(user);
         return userService.findAll();
     }

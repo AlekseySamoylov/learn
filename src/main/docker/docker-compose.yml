@@ -3,13 +3,22 @@ services:
   learn-api:
     build: .
     links:
-      - learn-mongo
+    - learn-mongo
     depends_on:
-      - learn-mongo
+    - learn-mongo
     ports:
-      - 8080:8080
+    - 8080:8080
   learn-mongo:
     image: mongo:latest
     container_name: "learn-mongo"
     ports:
-      - 27017
+    - 27017
+  learn-app:
+    image: alekseysamoylov/learn-app:latest
+    container_name: "learn-api"
+    links:
+    - learn-api
+    depends_on:
+    - learn-api
+    ports:
+    - 80:80
