@@ -11,7 +11,7 @@
     <name>learn-jdk10</name>
 
     <properties>
-        <java.version>10</java.version>
+        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <docker.image.prefix>alekseysamoylov</docker.image.prefix>
         <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.21</version>
+            <version>1.16.20</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -102,22 +102,22 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <release>${java.version}</release>
-                    <!--<fork>true</fork>-->
-                    <compilerArgs>
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>-->
-                        <!--<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>-->
-                    </compilerArgs>
+                    <!--<release>${java.version}</release>-->
+                    <!--&lt;!&ndash;<fork>true</fork>&ndash;&gt;-->
+                    <!--<compilerArgs>-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--&lt;!&ndash;<arg>-J&#45;&#45;add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>&ndash;&gt;-->
+                    <!--</compilerArgs>-->
                 </configuration>
             </plugin>
             <plugin>
