@@ -179,9 +179,9 @@
                                 <resource>
                                     <directory>src/main/docker/</directory>
                                     <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/*.yml</exclude>
-                                    </excludes>
+                                    <!--<excludes>-->
+                                    <!--<exclude>**/*.yml</exclude>-->
+                                    <!--</excludes>-->
                                 </resource>
                             </resources>
                         </configuration>
