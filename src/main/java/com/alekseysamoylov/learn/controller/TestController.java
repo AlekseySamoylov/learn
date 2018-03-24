@@ -1,5 +1,7 @@
 package com.alekseysamoylov.learn.controller;
 
+import springfox.documentation.annotations.ApiIgnore;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -12,6 +14,7 @@ import com.alekseysamoylov.learn.entity.User;
 import com.alekseysamoylov.learn.service.CardService;
 import com.alekseysamoylov.learn.service.UserService;
 
+@ApiIgnore
 @RestController
 public class TestController {
 

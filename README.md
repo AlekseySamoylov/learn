@@ -73,4 +73,7 @@ oc new-app alekseysamoylov/learn --name learn-api
 
 oc expose svc/learn-api
 
+<h4>Swagger</h4>
+UI: localhost:8080/swagger-ui.html
+
 

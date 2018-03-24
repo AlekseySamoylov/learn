@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM openjdk:10-jre
 COPY ./learn-1.0.jar /usr/src/learn/
 WORKDIR /usr/src/learn
 EXPOSE 8080
