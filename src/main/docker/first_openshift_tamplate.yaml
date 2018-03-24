@@ -1,0 +1,565 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: first_template
+objects:
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2018-03-18T12:37:04Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: learn-api
+    name: learn-api
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: alekseysamoylov/learn
+      from:
+        kind: DockerImage
+        name: 172.30.1.1:5000/learn/learn-api:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2018-03-18T12:35:59Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: learn-mongo
+    name: learn-mongo
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: library/mongo
+      from:
+        kind: DockerImage
+        name: 172.30.1.1:5000/learn/learn-mongo:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: learn-api
+    name: learn-api
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: learn-api
+      deploymentconfig: learn-api
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: learn-api
+          deploymentconfig: learn-api
+      spec:
+        containers:
+        - image: alekseysamoylov/learn@sha256:5e8d45542e82e37830c40ee6553c902d57e9c39ef1043c4fea0881a565e00dd1
+          imagePullPolicy: Always
+          name: learn-api
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - learn-api
+        from:
+          kind: ImageStreamTag
+          name: learn-api:latest
+          namespace: learn
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: learn-mongo
+    name: learn-mongo
+  spec:
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      app: learn-mongo
+      deploymentconfig: learn-mongo
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: learn-mongo
+          deploymentconfig: learn-mongo
+      spec:
+        containers:
+        - image: library/mongo@sha256:fd85473bdcfad727d1d8d755a4879b7c7427a7fc84f50c92ab87508653469c6d
+          imagePullPolicy: Always
+          name: learn-mongo
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/db
+            name: learn-mongo-volume-1
+          - mountPath: /data/configdb
+            name: learn-mongo-volume-2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: learn-mongo-volume-1
+        - emptyDir: {}
+          name: learn-mongo-volume-2
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - learn-mongo
+        from:
+          kind: ImageStreamTag
+          name: learn-mongo:latest
+          namespace: learn
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/host.generated: "true"
+    creationTimestamp: null
+    labels:
+      app: learn-api
+    name: learn-api
+  spec:
+    host: learn-api-learn.192.168.99.100.nip.io
+    port:
+      targetPort: 8080-tcp
+    to:
+      kind: Service
+      name: learn-api
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2018-03-18T12:37:17Z
+        status: "True"
+        type: Admitted
+      host: learn-api-learn.192.168.99.100.nip.io
+      routerName: router
+      wildcardPolicy: None
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/created-by: |
+        {"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicationController","namespace":"learn","name":"learn-api-1","uid":"1069532a-2aa9-11e8-86f4-08002770e3aa","apiVersion":"v1","resourceVersion":"31522"}}
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: learn-api
+      openshift.io/deployment.name: learn-api-1
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/scc: restricted
+    creationTimestamp: null
+    generateName: learn-api-1-
+    labels:
+      app: learn-api
+      deployment: learn-api-1
+      deploymentconfig: learn-api
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicationController
+      name: learn-api-1
+      uid: 1069532a-2aa9-11e8-86f4-08002770e3aa
+  spec:
+    containers:
+    - image: alekseysamoylov/learn@sha256:5e8d45542e82e37830c40ee6553c902d57e9c39ef1043c4fea0881a565e00dd1
+      imagePullPolicy: Always
+      name: learn-api
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          drop:
+          - KILL
+          - MKNOD
+          - SETGID
+          - SETUID
+        privileged: false
+        runAsUser: 1000110000
+        seLinuxOptions:
+          level: s0:c11,c0
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-ntbxr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-kptfk
+    nodeName: localhost
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1000110000
+      seLinuxOptions:
+        level: s0:c11,c0
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - name: default-token-ntbxr
+      secret:
+        defaultMode: 420
+        secretName: default-token-ntbxr
+  status:
+    phase: Pending
+    qosClass: BestEffort
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/created-by: |
+        {"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicationController","namespace":"learn","name":"learn-mongo-1","uid":"e97658db-2aa8-11e8-86f4-08002770e3aa","apiVersion":"v1","resourceVersion":"31413"}}
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: learn-mongo
+      openshift.io/deployment.name: learn-mongo-1
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/scc: restricted
+    creationTimestamp: null
+    generateName: learn-mongo-1-
+    labels:
+      app: learn-mongo
+      deployment: learn-mongo-1
+      deploymentconfig: learn-mongo
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicationController
+      name: learn-mongo-1
+      uid: e97658db-2aa8-11e8-86f4-08002770e3aa
+  spec:
+    containers:
+    - image: library/mongo@sha256:fd85473bdcfad727d1d8d755a4879b7c7427a7fc84f50c92ab87508653469c6d
+      imagePullPolicy: Always
+      name: learn-mongo
+      ports:
+      - containerPort: 27017
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          drop:
+          - KILL
+          - MKNOD
+          - SETGID
+          - SETUID
+        privileged: false
+        runAsUser: 1000110000
+        seLinuxOptions:
+          level: s0:c11,c0
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /data/db
+        name: learn-mongo-volume-1
+      - mountPath: /data/configdb
+        name: learn-mongo-volume-2
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-ntbxr
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-kptfk
+    nodeName: localhost
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      fsGroup: 1000110000
+      seLinuxOptions:
+        level: s0:c11,c0
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - emptyDir: {}
+      name: learn-mongo-volume-1
+    - emptyDir: {}
+      name: learn-mongo-volume-2
+    - name: default-token-ntbxr
+      secret:
+        defaultMode: 420
+        secretName: default-token-ntbxr
+  status:
+    phase: Pending
+    qosClass: BestEffort
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.completed-at: 2018-03-18 12:40:16 +0000 UTC
+      openshift.io/deployer-pod.created-at: 2018-03-18 12:37:04 +0000 UTC
+      openshift.io/deployer-pod.name: learn-api-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: learn-api
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: config change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"learn-api","namespace":"learn","selfLink":"/apis/apps.openshift.io/v1/namespaces/learn/deploymentconfigs/learn-api","uid":"0e46d795-2aa9-11e8-86f4-08002770e3aa","resourceVersion":"31503","generation":2,"creationTimestamp":"2018-03-18T12:37:01Z","labels":{"app":"learn-api"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["learn-api"],"from":{"kind":"ImageStreamTag","namespace":"learn","name":"learn-api:latest"},"lastTriggeredImage":"alekseysamoylov/learn@sha256:5e8d45542e82e37830c40ee6553c902d57e9c39ef1043c4fea0881a565e00dd1"}}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"app":"learn-api","deploymentconfig":"learn-api"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"learn-api","deploymentconfig":"learn-api"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"containers":[{"name":"learn-api","image":"alekseysamoylov/learn@sha256:5e8d45542e82e37830c40ee6553c902d57e9c39ef1043c4fea0881a565e00dd1","ports":[{"containerPort":8080,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2018-03-18T12:37:01Z","lastTransitionTime":"2018-03-18T12:37:01Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: learn-api
+      openshift.io/deployment-config.name: learn-api
+    name: learn-api-1
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: learn-api
+      uid: 0e46d795-2aa9-11e8-86f4-08002770e3aa
+  spec:
+    replicas: 1
+    selector:
+      app: learn-api
+      deployment: learn-api-1
+      deploymentconfig: learn-api
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: learn-api
+          openshift.io/deployment.name: learn-api-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: learn-api
+          deployment: learn-api-1
+          deploymentconfig: learn-api
+      spec:
+        containers:
+        - image: alekseysamoylov/learn@sha256:5e8d45542e82e37830c40ee6553c902d57e9c39ef1043c4fea0881a565e00dd1
+          imagePullPolicy: Always
+          name: learn-api
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.completed-at: 2018-03-18 12:38:41 +0000 UTC
+      openshift.io/deployer-pod.created-at: 2018-03-18 12:35:59 +0000 UTC
+      openshift.io/deployer-pod.name: learn-mongo-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: learn-mongo
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: config change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"learn-mongo","namespace":"learn","selfLink":"/apis/apps.openshift.io/v1/namespaces/learn/deploymentconfigs/learn-mongo","uid":"e787ffb3-2aa8-11e8-86f4-08002770e3aa","resourceVersion":"31398","generation":2,"creationTimestamp":"2018-03-18T12:35:56Z","labels":{"app":"learn-mongo"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["learn-mongo"],"from":{"kind":"ImageStreamTag","namespace":"learn","name":"learn-mongo:latest"},"lastTriggeredImage":"library/mongo@sha256:fd85473bdcfad727d1d8d755a4879b7c7427a7fc84f50c92ab87508653469c6d"}}],"replicas":1,"revisionHistoryLimit":10,"test":false,"selector":{"app":"learn-mongo","deploymentconfig":"learn-mongo"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"learn-mongo","deploymentconfig":"learn-mongo"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"learn-mongo-volume-1","emptyDir":{}},{"name":"learn-mongo-volume-2","emptyDir":{}}],"containers":[{"name":"learn-mongo","image":"library/mongo@sha256:fd85473bdcfad727d1d8d755a4879b7c7427a7fc84f50c92ab87508653469c6d","ports":[{"containerPort":27017,"protocol":"TCP"}],"resources":{},"volumeMounts":[{"name":"learn-mongo-volume-1","mountPath":"/data/db"},{"name":"learn-mongo-volume-2","mountPath":"/data/configdb"}],"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":1,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2018-03-18T12:35:56Z","lastTransitionTime":"2018-03-18T12:35:56Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: learn-mongo
+      openshift.io/deployment-config.name: learn-mongo
+    name: learn-mongo-1
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: learn-mongo
+      uid: e787ffb3-2aa8-11e8-86f4-08002770e3aa
+  spec:
+    replicas: 1
+    selector:
+      app: learn-mongo
+      deployment: learn-mongo-1
+      deploymentconfig: learn-mongo
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: learn-mongo
+          openshift.io/deployment.name: learn-mongo-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: learn-mongo
+          deployment: learn-mongo-1
+          deploymentconfig: learn-mongo
+      spec:
+        containers:
+        - image: library/mongo@sha256:fd85473bdcfad727d1d8d755a4879b7c7427a7fc84f50c92ab87508653469c6d
+          imagePullPolicy: Always
+          name: learn-mongo
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/db
+            name: learn-mongo-volume-1
+          - mountPath: /data/configdb
+            name: learn-mongo-volume-2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: learn-mongo-volume-1
+        - emptyDir: {}
+          name: learn-mongo-volume-2
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: learn-api
+    name: learn-api
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: learn-api
+      deploymentconfig: learn-api
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: learn-mongo
+    name: learn-mongo
+  spec:
+    ports:
+    - name: 27017-tcp
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      app: learn-mongo
+      deploymentconfig: learn-mongo
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}

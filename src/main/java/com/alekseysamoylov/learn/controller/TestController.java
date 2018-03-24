@@ -25,8 +25,8 @@ public class TestController {
 
     @RequestMapping("/saveUser")
     public List<User> saveUser() {
-        var randomNumber = ThreadLocalRandom.current().nextInt();
-        var user = new User().setName("Username" + randomNumber);
+        int randomNumber = ThreadLocalRandom.current().nextInt();
+        User user = new User().setName("Username" + randomNumber);
         userService.save(user);
         return userService.findAll();
     }
