@@ -82,8 +82,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.16.21</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/lombok-edge.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
