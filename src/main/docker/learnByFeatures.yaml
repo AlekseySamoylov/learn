@@ -1,0 +1,194 @@
+kind: Template
+apiVersion: v1
+metadata:
+  name: learn-project
+  annotations:
+    description: Java application with MongoDB backend and React frontend.
+    tags: learn,java,mongodb,git
+    iconClass: icon-java
+labels:
+  template: learn-project
+objects:
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: ${LEARN_APPLICATION_PROPERTIES}
+  data:
+    application.properties: |-
+        #mongodb
+        spring.data.mongodb.host=mongo
+        spring.data.mongodb.port=27017
+        spring.data.mongodb.database=learn
+        spring.data.mongodb.username=user
+        spring.data.mongodb.password=sql
+
+        #logging
+        logging.level.org.springframework.data=debug
+        logging.level.=error
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: fuse-java
+  spec:
+    dockerImageRepository: fabric8/s2i-java
+    tags:
+    - name: latest
+      annotations:
+        description: Build and run Fuse Java applications
+        iconClass: icon-fuse-java
+        tags: builder,java,fuse
+        supports: java:8,java
+        sampleRepo: https://github.com/rhuss/sti-camel-cdi
+- kind: ImageStream
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-api"
+    annotations:
+      description: Learn api Service
+
+- kind: BuildConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-api"
+    annotations:
+      description: Defines how to build  learn-api application
+    labels:
+      build: "${NAME}-api"
+  spec:
+    source:
+      type: Git
+      git:
+        uri: "${SOURCE_LEARN_REPOSITORY_URL}"
+        ref: "${SOURCE_LEARN_REPOSITORY_REF}"
+      contextDir: "${CONTEXT_DIR}"
+    strategy:
+      type: Source
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: fuse-java:latest
+        incremental: true
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}-api:latest"
+    triggers:
+    - type: ConfigChange
+    - type: Generic
+      generic:
+        secret: "${GENERIC_WEBHOOK_SECRET}"
+    resources: {}
+      
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-api-dep"
+    annotations:
+      description: Defines how to deploy the learn-api application
+  spec:
+    strategy:
+      type: Rolling
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - location-service
+        from:
+          kind: ImageStreamTag
+          name: "${NAME}-api:latest"
+    - type: ConfigChange
+    replicas: 1
+    selector:
+      name: "${NAME}-api-dep"
+    template:
+      metadata:
+        name: "${NAME}-api-dep"
+        labels:
+          name: "${NAME}-api-dep"
+      spec:
+        volumes:
+        - name: properties
+          configMap:
+            name: ${LEARN_APPLICATION_PROPERTIES}
+            items:
+            - key: application.properties
+              path: application.properties
+        containers:
+        - name: location-service
+          image: " "
+          volumeMounts:
+            - name: properties
+              mountPath: /deployments/config
+          ports:
+          - containerPort: 8080
+          - containerPort: 8009
+          - containerPort: 8443
+          env:
+          - name: SPRING_CONFIG_LOCATION
+            value: /deployments/config
+          resources:
+            limits:
+              memory: "${MEMORY_LIMIT_API}"
+            
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${NAME}-api-dep"
+    annotations:
+      description: Exposes the learn-api application pod
+  spec:
+    ports:
+    - name: web
+      port: 8080
+      targetPort: 8080
+    selector:
+      name: "${NAME}-api-dep"
+
+parameters:
+- name: PROJECT_NAME
+  displayName: Project Name (Retype)
+  description: Please enter project name again. The same name as on previous step.
+  required: true
+  value: ""
+- name: NAME
+  displayName: Name
+  description: The name assigned to all of the frontend objects defined in this template.
+  required: true
+  value: learn
+- name: ROUTER
+  displayName: App DNS name
+  description: The DNS name for application.
+  value: ""
+- name: NAMESPACE
+  displayName: Namespace
+  required: true
+  description: The OpenShift Namespace where the shared ImageStreams resides.
+  value: learn
+- name: MEMORY_LIMIT_API
+  displayName: Memory Limit
+  description: Maximum amount of memory container can use.
+  required: true
+  value: 1024Mi
+- name: CONTEXT_DIR
+  displayName: Context Directory
+  description: Set this to the relative path to your project if it is not in the root of your repository.
+  value: ""
+- name: GENERIC_WEBHOOK_SECRET
+  displayName: Generic Webhook Secret
+  description: A secret string used to configure the Generic webhook.
+  generate: expression
+  from: "[a-zA-Z0-9]{40}"
+- name: LEARN_APPLICATION_PROPERTIES
+  displayName: Application properties file for Learn api Application
+  description: Set config name to use for override spring-boot application properties.
+  value: learn-application-properties
+- name: SOURCE_LEARN_REPOSITORY_URL
+  displayName: Git Repository URL for Learn api
+  description: The URL of the repository with your application source code.
+  required: true
+  value: https://github.com/AlekseySamoylov/learn.git
+- name: SOURCE_LEARN_REPOSITORY_REF
+  displayName: Git Reference for Learn api repository
+  description: Set this to a branch name, tag or other ref of your repository if you are not using the default branch.
+  value: old-java
