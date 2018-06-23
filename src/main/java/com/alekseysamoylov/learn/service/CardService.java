@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.alekseysamoylov.learn.entity.Card;
-import com.alekseysamoylov.learn.entity.User;
 import com.alekseysamoylov.learn.repository.CardRepository;
-import com.alekseysamoylov.learn.repository.UserRepository;
 
 @Service
 @Transactional
@@ -32,6 +30,10 @@ public class CardService {
     public List<Card> deleteOne(Card card) {
         cardRepository.delete(card);
         return cardRepository.findAll();
+    }
+
+    public void testMethodForJmx(String message) {
+        System.out.println("Hello JMX " + message);
     }
 
     @Transactional(readOnly = true)

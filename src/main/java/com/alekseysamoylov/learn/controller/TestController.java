@@ -1,7 +1,5 @@
 package com.alekseysamoylov.learn.controller;
 
-import springfox.documentation.annotations.ApiIgnore;
-
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -13,6 +11,8 @@ import com.alekseysamoylov.learn.entity.Card;
 import com.alekseysamoylov.learn.entity.User;
 import com.alekseysamoylov.learn.service.CardService;
 import com.alekseysamoylov.learn.service.UserService;
+
+import springfox.documentation.annotations.ApiIgnore;
 
 @ApiIgnore
 @RestController
@@ -27,7 +27,7 @@ public class TestController {
     public List<User> saveUser() {
         int randomNumber = ThreadLocalRandom.current().nextInt();
         User user = new User().setName("Username" + randomNumber);
-        userService.save(user);
+        user = userService.save(user);
         return userService.findAll();
     }
 

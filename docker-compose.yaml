@@ -11,14 +11,9 @@ services:
   learn-mongo:
     image: mongo:latest
     container_name: "learn-mongo"
+    environment:
+      MONGODB_USER: "user"
+      MONGODB_DATABASE: "learn"
+      MONGODB_PASS: "sql"
     ports:
     - 27017
-#  learn-app:
-#    image: alekseysamoylov/learn-app:latest
-#    container_name: "learn-api"
-#    links:
-#    - learn-api
-#    depends_on:
-#    - learn-api
-#    ports:
-#    - 80:80
